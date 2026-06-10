@@ -1,0 +1,18 @@
+# Dependency directories
+node_modules/
+
+# Frontend folder (managed in a separate repo)
+frontend/
+
+# Local presentations and assets
+*.pptx
+*.png
+*.zip
+New folder/
+
+# Root level script files and metadata
+capture_screens.js
+create_ppt.js
+interview_preparation.md
+package.json
+package-lock.json
