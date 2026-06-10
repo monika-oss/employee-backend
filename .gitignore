@@ -10,9 +10,10 @@ frontend/
 *.zip
 New folder/
 
+# Environment variables
+.env
+
 # Root level script files and metadata
 capture_screens.js
 create_ppt.js
 interview_preparation.md
-package.json
-package-lock.json
