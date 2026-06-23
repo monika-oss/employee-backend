@@ -1,0 +1,9 @@
+{
+  "name": "employee-system",
+  "version": "1.0.0",
+  "description": "Employee Management System",
+  "scripts": {
+    "install": "cd backend && npm install",
+    "start": "cd backend && npm start"
+  }
+}
