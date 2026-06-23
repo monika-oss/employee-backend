@@ -3,7 +3,28 @@ const bcrypt = require('bcryptjs');
 
 const getAllEmployees = async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM employees');
+        const [rows] = await db.query('SELECT * FROM employees ORDER BY id ASC');
+        
+        // Auto-heal sequence if there are gaps
+        let needsUpdate = false;
+        for (let i = 0; i < rows.length; i++) {
+            const expectedId = 'EMP' + (i + 1).toString().padStart(3, '0');
+            if (rows[i].employee_id !== expectedId) {
+                needsUpdate = true;
+                break;
+            }
+        }
+        
+        if (needsUpdate) {
+            for (let i = 0; i < rows.length; i++) {
+                const newEmpId = 'EMP' + (i + 1).toString().padStart(3, '0');
+                if (rows[i].employee_id !== newEmpId) {
+                    await db.query('UPDATE employees SET employee_id = ? WHERE id = ?', [newEmpId, rows[i].id]);
+                    rows[i].employee_id = newEmpId;
+                }
+            }
+        }
+        
         res.status(200).json(rows);
     } catch (error) {
         console.error(error);
@@ -12,7 +33,7 @@ const getAllEmployees = async (req, res) => {
 };
 
 const addEmployee = async (req, res) => {
-    const { employee_id, name, email, phone, department, designation, salary } = req.body;
+    const { name, email, phone, department, designation, salary } = req.body;
     try {
         // 1. Create User account for login
         const defaultPassword = 'password123';
@@ -23,6 +44,11 @@ const addEmployee = async (req, res) => {
             [name, email, hashedPassword, 'Employee']
         );
         const userId = userResult.insertId;
+
+        // Auto-assign the next sequential ID
+        const [empCountRows] = await db.query('SELECT COUNT(*) as count FROM employees');
+        const nextIdNum = empCountRows[0].count + 1;
+        const employee_id = 'EMP' + nextIdNum.toString().padStart(3, '0');
 
         // 2. Create Employee record
         const [empResult] = await db.query(
