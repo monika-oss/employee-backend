@@ -85,7 +85,14 @@ const deleteEmployee = async (req, res) => {
             await db.query('DELETE FROM users WHERE id = ?', [userId]);
         }
 
-        res.status(200).json({ message: 'Employee deleted successfully' });
+        // Reassign employee IDs to make them continuous
+        const [allEmps] = await db.query('SELECT id FROM employees ORDER BY id ASC');
+        for (let i = 0; i < allEmps.length; i++) {
+            const newEmpId = 'EMP' + (i + 1).toString().padStart(3, '0');
+            await db.query('UPDATE employees SET employee_id = ? WHERE id = ?', [newEmpId, allEmps[i].id]);
+        }
+
+        res.status(200).json({ message: 'Employee deleted successfully and IDs updated' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
