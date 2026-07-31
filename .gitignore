@@ -2,7 +2,6 @@
 node_modules/
 
 # Frontend folder (managed in a separate repo)
-frontend/
 
 # Local presentations and assets
 *.pptx
